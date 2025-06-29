@@ -1,0 +1,453 @@
+================================================================================
+                    HỆ THỐNG ĐÁNH GIÁ NHÂN VIÊN - API ENDPOINTS
+================================================================================
+
+Base URL: http://localhost:8080
+
+================================================================================
+1. AUTHENTICATION & AUTHORIZATION (/api/auth)
+================================================================================
+
+POST   /api/auth/login
+       - Mô tả: Đăng nhập hệ thống
+       - Body: { "username": "string", "password": "string" }
+       - Response: JWT token + user info
+       - Role: Public
+
+POST   /api/auth/logout
+       - Mô tả: Đăng xuất hệ thống
+       - Header: Authorization: Bearer <token>
+       - Role: Authenticated
+
+GET    /api/auth/me
+       - Mô tả: Lấy thông tin user hiện tại
+       - Header: Authorization: Bearer <token>
+       - Role: Authenticated
+
+================================================================================
+2. ACCOUNT MANAGEMENT (/api/accounts)
+================================================================================
+
+GET    /api/accounts
+       - Mô tả: Lấy danh sách tài khoản (phân trang)
+       - Params: page, size, sort
+       - Role: MANAGER
+
+GET    /api/accounts/all
+       - Mô tả: Lấy tất cả tài khoản (không phân trang)
+       - Role: MANAGER
+
+POST   /api/accounts
+       - Mô tả: Tạo tài khoản mới
+       - Body: { "username", "password", "role", "status" }
+       - Role: MANAGER
+
+GET    /api/accounts/{id}
+       - Mô tả: Lấy tài khoản theo ID
+       - Role: MANAGER
+
+GET    /api/accounts/username/{username}
+       - Mô tả: Lấy tài khoản theo username
+       - Role: MANAGER
+
+PUT    /api/accounts/{id}
+       - Mô tả: Cập nhật tài khoản
+       - Body: { "username", "password", "role", "status" }
+       - Role: MANAGER
+
+DELETE /api/accounts/{id}
+       - Mô tả: Xóa tài khoản
+       - Role: MANAGER
+
+GET    /api/accounts/search
+       - Mô tả: Tìm kiếm tài khoản theo username
+       - Params: keyword
+       - Role: MANAGER
+
+GET    /api/accounts/role/{role}
+       - Mô tả: Lấy tài khoản theo role
+       - Role: MANAGER
+
+PUT    /api/accounts/{id}/status
+       - Mô tả: Cập nhật trạng thái tài khoản
+       - Body: { "status": "ACTIVE|INACTIVE" }
+       - Role: MANAGER
+
+================================================================================
+3. EMPLOYEE MANAGEMENT (/api/employees)
+================================================================================
+
+GET    /api/employees
+       - Mô tả: Lấy danh sách nhân viên (phân trang)
+       - Params: page, size, sort
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/employees/all
+       - Mô tả: Lấy tất cả nhân viên (không phân trang)
+       - Role: SUPERVISOR, MANAGER
+
+POST   /api/employees
+       - Mô tả: Tạo nhân viên mới
+       - Body: { "fullName", "division", "basic", "staffType", "startDate", "type", "departmentId" }
+       - Role: MANAGER
+
+GET    /api/employees/{code}
+       - Mô tả: Lấy nhân viên theo mã
+       - Role: EMPLOYEE (chính mình), SUPERVISOR, MANAGER
+
+PUT    /api/employees/{code}
+       - Mô tả: Cập nhật thông tin nhân viên
+       - Body: Employee data
+       - Role: MANAGER
+
+DELETE /api/employees/{code}
+       - Mô tả: Xóa nhân viên
+       - Role: MANAGER
+
+GET    /api/employees/department/{departmentId}
+       - Mô tả: Lấy nhân viên theo phòng ban
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/employees/search
+       - Mô tả: Tìm kiếm nhân viên
+       - Params: keyword
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/employees/staff-type/{staffType}
+       - Mô tả: Lấy nhân viên theo loại
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/employees/division/{division}
+       - Mô tả: Lấy nhân viên theo bộ phận
+       - Role: SUPERVISOR, MANAGER
+
+================================================================================
+4. DEPARTMENT MANAGEMENT (/api/departments)
+================================================================================
+
+GET    /api/departments
+       - Mô tả: Lấy danh sách phòng ban (phân trang)
+       - Params: page, size, sort
+       - Role: All
+
+GET    /api/departments/all
+       - Mô tả: Lấy tất cả phòng ban (không phân trang)
+       - Role: All
+
+POST   /api/departments
+       - Mô tả: Tạo phòng ban mới
+       - Body: { "departmentName", "managerCode" }
+       - Role: MANAGER
+
+GET    /api/departments/{id}
+       - Mô tả: Lấy phòng ban theo ID
+       - Role: All
+
+GET    /api/departments/name/{name}
+       - Mô tả: Lấy phòng ban theo tên
+       - Role: All
+
+GET    /api/departments/manager/{managerCode}
+       - Mô tả: Lấy phòng ban theo mã quản lý
+       - Role: All
+
+PUT    /api/departments/{id}
+       - Mô tả: Cập nhật phòng ban
+       - Body: Department data
+       - Role: MANAGER
+
+DELETE /api/departments/{id}
+       - Mô tả: Xóa phòng ban
+       - Role: MANAGER
+
+GET    /api/departments/search
+       - Mô tả: Tìm kiếm phòng ban theo tên
+       - Params: keyword
+       - Role: All
+
+GET    /api/departments/{id}/employees
+       - Mô tả: Lấy phòng ban với danh sách nhân viên
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/departments/{id}/cycles
+       - Mô tả: Lấy phòng ban với chu kỳ đánh giá
+       - Role: SUPERVISOR, MANAGER
+
+================================================================================
+5. EVALUATION CYCLE MANAGEMENT (/api/evaluation-cycles)
+================================================================================
+
+GET    /api/evaluation-cycles
+       - Mô tả: Lấy danh sách chu kỳ đánh giá (phân trang)
+       - Params: page, size, sort
+       - Role: All
+
+GET    /api/evaluation-cycles/all
+       - Mô tả: Lấy tất cả chu kỳ đánh giá (không phân trang)
+       - Role: All
+
+POST   /api/evaluation-cycles
+       - Mô tả: Tạo chu kỳ đánh giá mới
+       - Body: { "startDate", "endDate", "status", "departmentId" }
+       - Role: MANAGER
+
+GET    /api/evaluation-cycles/{id}
+       - Mô tả: Lấy chu kỳ đánh giá theo ID
+       - Role: All
+
+PUT    /api/evaluation-cycles/{id}
+       - Mô tả: Cập nhật chu kỳ đánh giá
+       - Body: Cycle data
+       - Role: MANAGER
+
+DELETE /api/evaluation-cycles/{id}
+       - Mô tả: Xóa chu kỳ đánh giá
+       - Role: MANAGER
+
+GET    /api/evaluation-cycles/department/{departmentId}
+       - Mô tả: Lấy chu kỳ theo phòng ban
+       - Role: All
+
+GET    /api/evaluation-cycles/status/{status}
+       - Mô tả: Lấy chu kỳ theo trạng thái
+       - Role: All
+
+GET    /api/evaluation-cycles/current
+       - Mô tả: Lấy chu kỳ hiện tại
+       - Role: All
+
+PUT    /api/evaluation-cycles/{id}/status
+       - Mô tả: Cập nhật trạng thái chu kỳ
+       - Body: { "status": "DRAFT|ACTIVE|COMPLETED|CANCELLED" }
+       - Role: MANAGER
+
+================================================================================
+6. CRITERIA FORM MANAGEMENT (/api/criteria-forms)
+================================================================================
+
+GET    /api/criteria-forms
+       - Mô tả: Lấy danh sách form tiêu chí (phân trang)
+       - Params: page, size, sort
+       - Role: All
+
+GET    /api/criteria-forms/all
+       - Mô tả: Lấy tất cả form tiêu chí (không phân trang)
+       - Role: All
+
+POST   /api/criteria-forms
+       - Mô tả: Tạo form tiêu chí mới
+       - Body: { "criteriaFormName", "evaluationCriteriaIds" }
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/criteria-forms/{id}
+       - Mô tả: Lấy form tiêu chí theo ID
+       - Role: All
+
+GET    /api/criteria-forms/name/{name}
+       - Mô tả: Lấy form tiêu chí theo tên
+       - Role: All
+
+PUT    /api/criteria-forms/{id}
+       - Mô tả: Cập nhật form tiêu chí
+       - Body: Form data
+       - Role: SUPERVISOR, MANAGER
+
+DELETE /api/criteria-forms/{id}
+       - Mô tả: Xóa form tiêu chí
+       - Role: MANAGER
+
+GET    /api/criteria-forms/cycle/{cycleId}
+       - Mô tả: Lấy form theo chu kỳ đánh giá
+       - Role: All
+
+GET    /api/criteria-forms/search
+       - Mô tả: Tìm kiếm form theo tên
+       - Params: keyword
+       - Role: All
+
+GET    /api/criteria-forms/criteria/{criteriaId}
+       - Mô tả: Lấy form chứa tiêu chí cụ thể
+       - Role: All
+
+GET    /api/criteria-forms/{id}/details
+       - Mô tả: Lấy form với chi tiết đầy đủ
+       - Role: All
+
+================================================================================
+7. EVALUATION CRITERIA MANAGEMENT (/api/evaluation-criteria)
+================================================================================
+
+GET    /api/evaluation-criteria
+       - Mô tả: Lấy danh sách tiêu chí đánh giá (phân trang)
+       - Params: page, size, sort
+       - Role: All
+
+GET    /api/evaluation-criteria/all
+       - Mô tả: Lấy tất cả tiêu chí đánh giá (không phân trang)
+       - Role: All
+
+POST   /api/evaluation-criteria
+       - Mô tả: Tạo tiêu chí đánh giá mới
+       - Body: { "criteriaName" }
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/evaluation-criteria/{id}
+       - Mô tả: Lấy tiêu chí đánh giá theo ID
+       - Role: All
+
+GET    /api/evaluation-criteria/name/{name}
+       - Mô tả: Lấy tiêu chí đánh giá theo tên
+       - Role: All
+
+PUT    /api/evaluation-criteria/{id}
+       - Mô tả: Cập nhật tiêu chí đánh giá
+       - Body: Criteria data
+       - Role: SUPERVISOR, MANAGER
+
+DELETE /api/evaluation-criteria/{id}
+       - Mô tả: Xóa tiêu chí đánh giá
+       - Role: MANAGER
+
+GET    /api/evaluation-criteria/search
+       - Mô tả: Tìm kiếm tiêu chí theo tên
+       - Params: keyword
+       - Role: All
+
+GET    /api/evaluation-criteria/{id}/questions
+       - Mô tả: Lấy tiêu chí với danh sách câu hỏi
+       - Role: All
+
+================================================================================
+8. EVALUATION QUESTION MANAGEMENT (/api/evaluation-questions)
+================================================================================
+
+GET    /api/evaluation-questions
+       - Mô tả: Lấy danh sách câu hỏi đánh giá (phân trang)
+       - Params: page, size, sort
+       - Role: All
+
+GET    /api/evaluation-questions/all
+       - Mô tả: Lấy tất cả câu hỏi đánh giá (không phân trang)
+       - Role: All
+
+POST   /api/evaluation-questions
+       - Mô tả: Tạo câu hỏi đánh giá mới
+       - Body: { "questionName", "maxScore", "evaluationCriteriaId" }
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/evaluation-questions/{id}
+       - Mô tả: Lấy câu hỏi đánh giá theo ID
+       - Role: All
+
+PUT    /api/evaluation-questions/{id}
+       - Mô tả: Cập nhật câu hỏi đánh giá
+       - Body: Question data
+       - Role: SUPERVISOR, MANAGER
+
+DELETE /api/evaluation-questions/{id}
+       - Mô tả: Xóa câu hỏi đánh giá
+       - Role: MANAGER
+
+GET    /api/evaluation-questions/criteria/{criteriaId}
+       - Mô tả: Lấy câu hỏi theo tiêu chí
+       - Role: All
+
+GET    /api/evaluation-questions/search
+       - Mô tả: Tìm kiếm câu hỏi theo tên
+       - Params: keyword
+       - Role: All
+
+GET    /api/evaluation-questions/max-score/{score}
+       - Mô tả: Lấy câu hỏi theo điểm tối đa
+       - Role: All
+
+GET    /api/evaluation-questions/ordered
+       - Mô tả: Lấy câu hỏi đã sắp xếp theo tiêu chí và tên
+       - Role: All
+
+GET    /api/evaluation-questions/criteria/{criteriaId}/count
+       - Mô tả: Đếm số câu hỏi theo tiêu chí
+       - Role: All
+
+================================================================================
+9. EVALUATION SYSTEM (/api/evaluations)
+================================================================================
+
+POST   /api/evaluations/start
+       - Mô tả: Bắt đầu đánh giá mới cho nhân viên
+       - Body: { "employeeCode", "criteriaFormId" }
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/evaluations
+       - Mô tả: Lấy danh sách đánh giá (phân trang)
+       - Params: page, size, sort
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/evaluations/{id}
+       - Mô tả: Lấy chi tiết đánh giá theo ID
+       - Role: EMPLOYEE (chính mình), SUPERVISOR, MANAGER
+
+GET    /api/evaluations/pending-reviews
+       - Mô tả: Lấy danh sách đánh giá chờ duyệt
+       - Params: reviewerEmployeeCode, reviewerRole
+       - Role: SUPERVISOR, MANAGER
+
+PUT    /api/evaluations/{id}/self-assess
+       - Mô tả: Nộp tự đánh giá
+       - Body: { "assessmentItems": [{"questionId", "employeeScore", "employeeComment"}] }
+       - Role: EMPLOYEE (chính mình)
+
+PUT    /api/evaluations/{id}/review
+       - Mô tả: Nộp đánh giá của supervisor/manager
+       - Body: { "reviewerType", "reviewItems": [{"questionId", "score", "comment"}] }
+       - Role: SUPERVISOR, MANAGER
+
+GET    /api/evaluations/{id}/summary
+       - Mô tả: Lấy tổng kết đánh giá
+       - Role: EMPLOYEE (chính mình), SUPERVISOR, MANAGER
+
+GET    /api/evaluations/employee/{employeeCode}
+       - Mô tả: Lấy đánh giá theo nhân viên
+       - Role: EMPLOYEE (chính mình), SUPERVISOR, MANAGER
+
+GET    /api/evaluations/criteria-form/{formId}
+       - Mô tả: Lấy đánh giá theo form tiêu chí
+       - Role: SUPERVISOR, MANAGER
+
+================================================================================
+NOTES:
+================================================================================
+
+1. AUTHENTICATION:
+   - Tất cả endpoint (trừ /api/auth/login) đều yêu cầu JWT token
+   - Header: Authorization: Bearer <token>
+
+2. ROLES:
+   - EMPLOYEE: Nhân viên thông thường
+   - SUPERVISOR: Giám sát, có thể đánh giá nhân viên
+   - MANAGER: Quản lý, có quyền cao nhất
+
+3. PAGINATION:
+   - Params: page (0-based), size, sort
+   - Example: ?page=0&size=10&sort=id,desc
+
+4. RESPONSE FORMAT:
+   {
+     "code": 200,
+     "message": "Success message",
+     "result": { ... }
+   }
+
+5. ERROR CODES:
+   - 200: Success
+   - 201: Created
+   - 400: Bad Request
+   - 401: Unauthorized
+   - 403: Forbidden
+   - 404: Not Found
+   - 409: Conflict
+   - 500: Internal Server Error
+
+================================================================================
+END OF API DOCUMENTATION
+================================================================================

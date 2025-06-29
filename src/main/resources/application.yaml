@@ -2,17 +2,7 @@ server:
   port: 8080
   servlet:
     context-path: /assessment-employee
-
 spring:
-  kafka:
-    bootstrap-servers: localhost:9094
-    consumer:
-      group-id: notification-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
   datasource:
     url: "jdbc:mysql://localhost:3306/assessment-employee"
     username: "root"
@@ -20,9 +10,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: true
+      show-sql: trueÊ
 logging:
   level:
     org.springframework.web: DEBUG
     org.hibernate.validator: DEBUG
+
+# JWT Configuration
+jwt:
+  secret: "mySecretKeyForAssessmentEmployeeSystemThatShouldBeLongEnoughForSecurity"
+  expiration: 86400  # 24 hours in seconds
 

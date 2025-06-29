@@ -15,7 +15,7 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long code;
-    private String fullname;
+    private String fullName;
     private String division;
     private String basic;
     private String staffType;
