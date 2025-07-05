@@ -49,13 +49,11 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     List<Department> findAllWithEvaluationCycles();
     
     /**
-     * Find departments with full information (employees + evaluation cycles)
+     * Find all departments (basic info only)
      * @return List<Department>
      */
-    @Query("SELECT DISTINCT d FROM Department d " +
-           "LEFT JOIN FETCH d.employees " +
-           "LEFT JOIN FETCH d.evaluationCycles")
-    List<Department> findAllWithFullInfo();
+    @Query("SELECT d FROM Department d")
+    List<Department> findAllBasic();
     
     /**
      * Find department by ID with employees

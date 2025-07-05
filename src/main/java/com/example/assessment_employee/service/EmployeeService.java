@@ -186,16 +186,20 @@ public class EmployeeService {
     /**
      * Delete employee
      */
+    @Transactional
     public void deleteEmployee(Long code) {
         log.info("Deleting employee with code: {}", code);
-        
-        if (!employeeRepository.existsById(code)) {
-            log.warn("Employee not found for deletion with code: {}", code);
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
-        
-        employeeRepository.deleteById(code);
-        
+
+        // Find the employee first to ensure it exists
+        Employee employee = employeeRepository.findById(code)
+            .orElseThrow(() -> {
+                log.warn("Employee not found for deletion with code: {}", code);
+                return new AppException(ErrorCode.USER_NOT_EXISTED);
+            });
+
+        // Delete the employee
+        employeeRepository.delete(employee);
+
         log.info("Employee deleted successfully with code: {}", code);
     }
     
