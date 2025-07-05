@@ -103,8 +103,8 @@ public class DepartmentService {
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAllDepartments() {
         log.info("Getting all departments");
-        
-        List<Department> departments = departmentRepository.findAllWithFullInfo();
+
+        List<Department> departments = departmentRepository.findAllBasic();
         return mapToResponseList(departments);
     }
     

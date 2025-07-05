@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /assessment-employee
+    context-path: /
 spring:
   datasource:
     url: "jdbc:mysql://localhost:3306/assessment-employee"
@@ -10,7 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: trueÊ
+    show-sql: true
 logging:
   level:
     org.springframework.web: DEBUG
