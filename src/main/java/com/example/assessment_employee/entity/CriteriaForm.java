@@ -21,6 +21,4 @@ public class CriteriaForm {
 
     @ManyToMany
     private List<EvaluationCriteria> evaluationCriteria;
-
-
 }
