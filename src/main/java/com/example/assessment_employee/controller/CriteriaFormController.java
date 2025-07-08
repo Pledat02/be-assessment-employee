@@ -112,7 +112,7 @@ public class CriteriaFormController {
     public ResponseEntity<ApiResponse<CriteriaFormResponse>> updateCriteriaForm(
             @PathVariable Long id,
             @Valid @RequestBody CriteriaFormCreateRequest request) {
-        log.info("Update criteria form request for ID: {}", id);
+        log.info("Update criteria form request for ID: {}", request);
         
         CriteriaFormResponse form = criteriaFormService.updateCriteriaForm(id, request);
         

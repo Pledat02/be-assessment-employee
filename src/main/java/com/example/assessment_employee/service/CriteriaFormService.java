@@ -19,9 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -108,6 +110,7 @@ public class CriteriaFormService {
         // Convert request to entity
         CriteriaForm criteriaForm = criteriaFormMapper.toEntity(request);
         criteriaForm.setEvaluationCriteria(evaluationCriteria);
+        criteriaForm.setEvaluationCycleId(request.getEvaluationCycleId());
         
         // Save criteria form
         CriteriaForm savedForm = criteriaFormRepository.save(criteriaForm);
@@ -185,7 +188,7 @@ public class CriteriaFormService {
                     log.warn("Criteria form not found for update with ID: {}", id);
                     return new AppException(ErrorCode.CRITERIA_FORM_NOT_FOUND);
                 });
-        
+
         // Check if form name is being changed and if new name already exists
         if (!existingForm.getCriteriaFormName().equals(request.getCriteriaFormName()) &&
             criteriaFormRepository.existsByCriteriaFormName(request.getCriteriaFormName())) {
@@ -220,7 +223,7 @@ public class CriteriaFormService {
         // Update form fields
         criteriaFormMapper.updateEntity(request, existingForm);
         existingForm.setEvaluationCriteria(evaluationCriteria);
-
+        existingForm.setEvaluationCycleId(request.getEvaluationCycleId());
         CriteriaForm updatedForm = criteriaFormRepository.save(existingForm);
         
         log.info("Criteria form updated successfully with ID: {}", updatedForm.getCriteriaFormId());

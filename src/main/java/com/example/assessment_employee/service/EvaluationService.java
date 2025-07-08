@@ -68,11 +68,12 @@ public class EvaluationService {
                             || item.getSupervisorScore() > question.getMaxScore()) {
                         throw new AppException(ErrorCode.INVALID_MAX_SCORE);
                     }
-
-                    EvaluationAnswers answer = EvaluationAnswers.builder()
-                            .question(question)
-                            .summaryAssessment(summaryAssessment)
-                            .build();
+                    EvaluationAnswers answer = evaluationAnswersRepository
+                            .findBySummaryAssessmentIdAndQuestionId(summaryAssessment.getSummaryAssessmentId(), item.getQuestionId())
+                            .orElse(EvaluationAnswers.builder()
+                                    .question(question)
+                                    .summaryAssessment(summaryAssessment)
+                                    .build());
 
                     // Set score based on assessor's role
                     if (isEmployeeAssessor(assessor, employee)) {
@@ -84,7 +85,7 @@ public class EvaluationService {
                     } else {
                         throw new AppException(ErrorCode.VALIDATION_ERROR);
                     }
-
+                    answer.setTotalScore(answer.getAVGScore());
                     return answer;
                 })
                 .toList();
