@@ -102,7 +102,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countTotalEmployees();
 
     @Query("""
-    SELECT DISTINCT ea.employee FROM EvaluationAnswers ea
+    SELECT DISTINCT ea.summaryAssessment.employee FROM EvaluationAnswers ea
 """)
     List<Employee> findDistinctEvaluatedEmployees();
 

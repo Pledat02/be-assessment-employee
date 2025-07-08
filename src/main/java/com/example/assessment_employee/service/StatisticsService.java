@@ -72,7 +72,7 @@ public class StatisticsService {
         LocalDate start = getQuarterStartDate(quarter, year);
         LocalDate end = getQuarterEndDate(quarter, year);
 
-        List<Object[]> rawResults = evaluationAnswersRepository.fetchAverageByCriteriaRaw(start.toString(), end.toString(), departmentId);
+        List<Object[]> rawResults = evaluationAnswersRepository.getAverageScoreByCriteria(start.toString(), end.toString(), departmentId);
 
         return rawResults.stream()
                 .map(obj -> new CriteriaAverageResponse(
