@@ -91,8 +91,6 @@ public interface CriteriaFormRepository extends JpaRepository<CriteriaForm, Long
      * Find criteria forms with full details (criteria and their questions)
      * @return List<CriteriaForm>
      */
-    @Query("SELECT DISTINCT cf FROM CriteriaForm cf " +
-           "LEFT JOIN FETCH cf.evaluationCriteria ec " +
-           "LEFT JOIN FETCH ec.evaluationQuestions")
+    @Query("SELECT DISTINCT cf FROM CriteriaForm cf LEFT JOIN FETCH cf.evaluationCriteria")
     List<CriteriaForm> findAllWithFullDetails();
 }

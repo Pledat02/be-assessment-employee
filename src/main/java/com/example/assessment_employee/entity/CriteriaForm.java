@@ -25,5 +25,4 @@ public class CriteriaForm {
     private Set<EvaluationCriteria> evaluationCriteria;
 
 
-
 }
