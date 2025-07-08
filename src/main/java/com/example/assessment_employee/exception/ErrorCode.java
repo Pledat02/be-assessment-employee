@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     // User & Account errors (1100-1199)
     USER_NOT_EXISTED(1100, "User not found", HttpStatus.NOT_FOUND),
+    ASSESSOR_NOT_FOUND(1100, "ASSESSOR not found", HttpStatus.NOT_FOUND),
     USER_EXISTED(1101, "User already exists", HttpStatus.CONFLICT),
     USERNAME_EXISTED(1102, "Username already exists", HttpStatus.CONFLICT),
     ACCOUNT_INACTIVE(1103, "Account is inactive", HttpStatus.FORBIDDEN),
@@ -72,6 +73,7 @@ public enum ErrorCode {
 
     // Evaluation Process errors (1800-1899)
     EVALUATION_NOT_FOUND(1800, "Evaluation not found", HttpStatus.NOT_FOUND),
+    SUMMARY_ASSESSMENT_NOT_FOUND(1800, "SUMMARY_ASSESSMENT not found", HttpStatus.NOT_FOUND),
     EVALUATION_ALREADY_EXISTS(1801, "Evaluation already exists for this employee and cycle", HttpStatus.CONFLICT),
     EVALUATION_ALREADY_COMPLETED(1802, "Evaluation is already completed", HttpStatus.CONFLICT),
     EVALUATION_NOT_STARTED(1803, "Evaluation has not been started", HttpStatus.BAD_REQUEST),

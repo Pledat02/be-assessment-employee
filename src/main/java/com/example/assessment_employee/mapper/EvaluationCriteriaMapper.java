@@ -44,7 +44,7 @@ public interface EvaluationCriteriaMapper {
      */
     @Mapping(target = "evaluationCriteriaId", source = "evaluationCriteriaId")
     @Mapping(target = "criteriaName", source = "criteriaName")
-    @Mapping(target = "questions", ignore = true) // Will be set manually
+//    @Mapping(target = "questions", ignore = true) // Will be set manually
     com.example.assessment_employee.dto.response.CriteriaFormResponse.EvaluationCriteriaInfo toEvaluationCriteriaInfo(EvaluationCriteria evaluationCriteria);
 
     /**
