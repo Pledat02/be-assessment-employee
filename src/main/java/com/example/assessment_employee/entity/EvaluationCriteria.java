@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 @NoArgsConstructor
@@ -18,12 +19,8 @@ public class EvaluationCriteria {
     private Long evaluationCriteriaId;
     private String criteriaName;
 
-//    @ManyToMany
-//    @JoinColumn(name = "criteria_form_id")
-//    private List<CriteriaForm> criteriaForm;
 
     @OneToMany(mappedBy = "evaluationCriteria")
+    @BatchSize(size = 50)
     private List<EvaluationQuestions> evaluationQuestions;
-
-
 }

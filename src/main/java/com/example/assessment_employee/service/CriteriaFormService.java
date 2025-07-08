@@ -8,7 +8,6 @@ import com.example.assessment_employee.exception.AppException;
 import com.example.assessment_employee.exception.ErrorCode;
 import com.example.assessment_employee.mapper.CriteriaFormMapper;
 import com.example.assessment_employee.mapper.EvaluationCriteriaMapper;
-import com.example.assessment_employee.mapper.EvaluationQuestionMapper;
 import com.example.assessment_employee.repository.CriteriaFormRepository;
 import com.example.assessment_employee.repository.EvaluationCriteriaRepository;
 import com.example.assessment_employee.repository.EvaluationAnswersRepository;
@@ -24,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +35,6 @@ public class CriteriaFormService {
     private final EvaluationAnswersRepository evaluationAnswersRepository;
     private final CriteriaFormMapper criteriaFormMapper;
     private final EvaluationCriteriaMapper evaluationCriteriaMapper;
-    private final EvaluationQuestionMapper evaluationQuestionMapper;
 
     /**
      * Helper method to manually map CriteriaForm to CriteriaFormResponse
@@ -51,24 +50,12 @@ public class CriteriaFormService {
                         criteriaInfo.setEvaluationCriteriaId(criteria.getEvaluationCriteriaId());
                         criteriaInfo.setCriteriaName(criteria.getCriteriaName());
 
-                        if (criteria.getEvaluationQuestions() != null && !criteria.getEvaluationQuestions().isEmpty()) {
-                            List<CriteriaFormResponse.QuestionInfo> questionInfoList = criteria.getEvaluationQuestions().stream()
-                                    .map(question -> {
-                                        CriteriaFormResponse.QuestionInfo questionInfo =
-                                                new CriteriaFormResponse.QuestionInfo();
-                                        questionInfo.setEvaluationQuestionId(question.getEvaluationQuestionId());
-                                        questionInfo.setQuestionName(question.getQuestionName());
-                                        questionInfo.setMaxScore(question.getMaxScore());
-                                        return questionInfo;
-                                    })
-                                    .collect(java.util.stream.Collectors.toList());
-                            criteriaInfo.setQuestions(questionInfoList);
-                        }
-
                         return criteriaInfo;
                     })
-                    .collect(java.util.stream.Collectors.toList());
+                    .collect(Collectors.toList());
             response.setEvaluationCriteria(criteriaInfoList);
+        } else {
+            response.setEvaluationCriteria(Collections.emptyList());
         }
 
         return response;
@@ -290,20 +277,20 @@ public class CriteriaFormService {
         List<CriteriaForm> forms = criteriaFormRepository.findByCriteriaId(criteriaId);
         return mapToResponseList(forms);
     }
-    
+
     /**
-     * Get criteria form with full details (criteria and questions)
+     * Get criteria form with full details
      */
     @Transactional(readOnly = true)
     public CriteriaFormResponse getCriteriaFormWithFullDetails(Long id) {
         log.info("Getting criteria form with full details for ID: {}", id);
-        
+
         CriteriaForm form = criteriaFormRepository.findByIdWithEvaluationCriteria(id)
                 .orElseThrow(() -> {
                     log.warn("Criteria form not found with ID: {}", id);
                     return new AppException(ErrorCode.CRITERIA_FORM_NOT_FOUND);
                 });
-        
+
         return mapToResponse(form);
     }
     
