@@ -1,4 +1,4 @@
-package com.example.assessment_employee.dto.request;
+package com.example.assessment_employee.dto.response;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,15 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SelfAssessmentRequest {
-    
-    @NotNull(message = "Evaluation answer ID is required")
-    private Long evaluationAnswerId;
+public class SummaryAssessmentResponse {
     
     @NotEmpty(message = "At least one assessment item is required")
     @Valid
     private List<AssessmentItem> assessmentItems;
-    
+    @NotNull(message = "Employee score is required")
+    private long assessorId;
+    private String comment;
+    private long employeeId;
+    private long formId;
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -31,10 +33,10 @@ public class SelfAssessmentRequest {
         
         @NotNull(message = "Question ID is required")
         private Long questionId;
-        
-        @NotNull(message = "Employee score is required")
-        private Long employeeScore;
-        
-        private String employeeComment;
+        private int employeeScore;
+        private int supervisorScore;
+        private int managerScore;
+
+
     }
 }

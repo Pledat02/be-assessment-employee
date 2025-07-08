@@ -18,6 +18,6 @@ public class LoginRequest {
     private String username;
     
     @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+    @Size(min = 2, max = 100, message = "Password must be between 6 and 100 characters")
     private String password;
 }

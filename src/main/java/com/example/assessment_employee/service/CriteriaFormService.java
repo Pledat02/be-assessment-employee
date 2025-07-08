@@ -19,8 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,10 +96,11 @@ public class CriteriaFormService {
             log.warn("Criteria form creation failed: No evaluation criteria provided");
             throw new AppException(ErrorCode.CRITERIA_FORM_EMPTY);
         }
-        
-        List<EvaluationCriteria> evaluationCriteria = evaluationCriteriaRepository
-                .findByCriteriaIds(request.getEvaluationCriteriaIds());
-        
+
+        Set<EvaluationCriteria> evaluationCriteria = new HashSet<>(
+                evaluationCriteriaRepository.findByCriteriaIds(request.getEvaluationCriteriaIds())
+        );
+
         if (evaluationCriteria.size() != request.getEvaluationCriteriaIds().size()) {
             log.warn("Criteria form creation failed: Some evaluation criteria not found");
             throw new AppException(ErrorCode.EVALUATION_CRITERIA_NOT_FOUND);
@@ -205,9 +208,10 @@ public class CriteriaFormService {
             log.warn("Criteria form update failed: No evaluation criteria provided");
             throw new AppException(ErrorCode.CRITERIA_FORM_EMPTY);
         }
-        
-        List<EvaluationCriteria> evaluationCriteria = evaluationCriteriaRepository
-                .findByCriteriaIds(request.getEvaluationCriteriaIds());
+
+        Set<EvaluationCriteria> evaluationCriteria = new HashSet<>(
+                evaluationCriteriaRepository.findByCriteriaIds(request.getEvaluationCriteriaIds())
+        );
         
         if (evaluationCriteria.size() != request.getEvaluationCriteriaIds().size()) {
             log.warn("Criteria form update failed: Some evaluation criteria not found");
@@ -217,7 +221,7 @@ public class CriteriaFormService {
         // Update form fields
         criteriaFormMapper.updateEntity(request, existingForm);
         existingForm.setEvaluationCriteria(evaluationCriteria);
-        
+
         CriteriaForm updatedForm = criteriaFormRepository.save(existingForm);
         
         log.info("Criteria form updated successfully with ID: {}", updatedForm.getCriteriaFormId());
@@ -236,13 +240,6 @@ public class CriteriaFormService {
                     log.warn("Criteria form not found for deletion with ID: {}", id);
                     return new AppException(ErrorCode.CRITERIA_FORM_NOT_FOUND);
                 });
-        
-        // Check if this specific form is being used in evaluations
-        long formUsageCount = evaluationAnswersRepository.countByCriteriaFormId(id);
-        if (formUsageCount > 0) {
-            log.warn("Cannot delete criteria form with existing evaluations: {}", id);
-            throw new AppException(ErrorCode.CRITERIA_FORM_HAS_EVALUATIONS);
-        }
         
         criteriaFormRepository.deleteById(id);
         

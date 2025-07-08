@@ -19,6 +19,7 @@ public class EvaluationResponse {
     private Long criteriaFormId;
     private String criteriaFormName;
     private EmployeeInfo employee;
+
     private List<EvaluationDetail> evaluationDetails;
     
     @Data
@@ -41,11 +42,10 @@ public class EvaluationResponse {
         private Long evaluationQuestionDetailId;
         private QuestionInfo question;
         private Long employeeScore;
-        private String employeeComment;
         private Long supervisorScore;
-        private String supervisorComment;
         private Long managerScore;
-        private String managerComment;
+        private String comment;
+        private String sentiment;
     }
     
     @Data
