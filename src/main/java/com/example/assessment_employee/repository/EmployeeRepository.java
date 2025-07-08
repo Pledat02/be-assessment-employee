@@ -94,4 +94,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
      */
     @Query("SELECT e FROM Employee e WHERE e.department.departmentId = :departmentId AND e.staffType = :staffType")
     List<Employee> findByDepartmentIdAndStaffType(@Param("departmentId") Long departmentId, @Param("staffType") String staffType);
+
+    /**
+     * Thống kê tổng số nhân viên
+     */
+    @Query("SELECT COUNT(e) FROM Employee e")
+    long countTotalEmployees();
+
+    @Query("""
+    SELECT DISTINCT ea.employee FROM EvaluationAnswers ea
+""")
+    List<Employee> findDistinctEvaluatedEmployees();
+
+
 }
