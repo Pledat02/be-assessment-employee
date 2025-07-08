@@ -34,9 +34,11 @@ public class AssessmentRequest {
         
         @NotNull(message = "Question ID is required")
         private Long questionId;
-        
-        @NotNull(message = "Employee score is required")
-        private int score;
+
+        private int employeeScore;
+        private int supervisorScore;
+        private int managerScore;
+
 
 
     }

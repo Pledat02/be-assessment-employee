@@ -63,7 +63,9 @@ public class EvaluationService {
                 .map(item -> {
                     EvaluationQuestions question = evaluationQuestionsRepository.findById(item.getQuestionId())
                             .orElseThrow(() -> new AppException(ErrorCode.EVALUATION_QUESTION_NOT_FOUND));
-                    if (item.getScore() > question.getMaxScore()) {
+                    if (item.getEmployeeScore() > question.getMaxScore()
+                    || item.getManagerScore() > question.getMaxScore()
+                            || item.getSupervisorScore() > question.getMaxScore()) {
                         throw new AppException(ErrorCode.INVALID_MAX_SCORE);
                     }
 
@@ -74,11 +76,11 @@ public class EvaluationService {
 
                     // Set score based on assessor's role
                     if (isEmployeeAssessor(assessor, employee)) {
-                        answer.setTotalScoreByEmployee((long) item.getScore());
+                        answer.setTotalScoreByEmployee(item.getEmployeeScore());
                     } else if (isManagerAssessor(assessor, employee)) {
-                        answer.setTotalScoreByManager(item.getScore());
+                        answer.setTotalScoreByManager(item.getManagerScore());
                     } else if (isSupervisorAssessor(assessor, employee)) {
-                        answer.setTotalScoreBySupervision(item.getScore());
+                        answer.setTotalScoreBySupervision(item.getSupervisorScore());
                     } else {
                         throw new AppException(ErrorCode.VALIDATION_ERROR);
                     }
@@ -89,9 +91,6 @@ public class EvaluationService {
 
         // Add evaluation answers to summary assessment
         summaryAssessment.getEvaluationAnswers().addAll(evaluationAnswersList);
-
-        // Calculate total and average score
-        calculateAverageScore(summaryAssessment);
 
         // Set comment if provided
         if (request.getComment() != null && !request.getComment().trim().isEmpty()) {
@@ -136,22 +135,7 @@ public class EvaluationService {
         return summaryAssessmentMapper.toSummaryAssessmentResponse(summaryAssessment);
     }
 
-    /**
-     * Calculates the average score for the summary assessment based on evaluation answers.
-     */
-    private void calculateAverageScore(SummaryAssessment summaryAssessment) {
-        List<EvaluationAnswers> answers = summaryAssessment.getEvaluationAnswers();
-        if (answers.isEmpty()) {
-            summaryAssessment.setAverageScore(0.0);
-            return;
-        }
 
-        double totalScore = answers.stream()
-                .mapToDouble(EvaluationAnswers::getScore)
-                .sum();
-        double averageScore = totalScore / answers.size();
-        summaryAssessment.setAverageScore(averageScore);
-    }
 
     /**
      * Checks if the assessor is the same as the employee (self-assessment).
@@ -166,7 +150,8 @@ public class EvaluationService {
     private boolean isManagerAssessor(Employee assessor, Employee employee) {
         Department department = employee.getDepartment();
         return department != null && department.getManagerCode() != null
-                && department.getManagerCode().equals(assessor.getCode().toString());
+                && Objects.equals(department.getDepartmentId(), assessor.getDepartment().getDepartmentId())
+                && assessor.getAccount().getRole().equals(RoleConstants.MANAGER);
     }
 
     /**

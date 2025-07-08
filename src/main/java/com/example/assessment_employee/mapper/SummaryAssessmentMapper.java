@@ -33,14 +33,12 @@ public interface SummaryAssessmentMapper {
         }
         return evaluationAnswers.stream()
                 .map(answer -> {
-                    // Vì không có EvaluationAnswersDetail, giả định score lấy từ totalScoreByEmployee
-                    // hoặc một trong các score khác; questionId tạm đặt null
-                    int score = answer.getTotalScoreByEmployee() != null ? answer.getTotalScoreByEmployee().intValue() :
-                            answer.getTotalScoreByManager() != 0 ? answer.getTotalScoreByManager() :
-                                    answer.getTotalScoreBySupervision();
+
                     return SummaryAssessmentResponse.AssessmentItem.builder()
                             .questionId(answer.getQuestion().getEvaluationQuestionId())
-                            .score(score)
+                            .employeeScore(answer.getTotalScoreByEmployee())
+                            .supervisorScore(answer.getTotalScoreBySupervision())
+                            .managerScore(answer.getTotalScoreByManager())
                             .build();
                 })
                 .collect(Collectors.toList());
