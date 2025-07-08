@@ -15,13 +15,16 @@ public class EvaluationAnswers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long evaluationAnswerId;
-    private Long totalScore;
-    private String totalScoreManager;
-    private long criteriaFormId;
+    private int totalScoreByEmployee;
+    private int totalScoreByManager;
+    private int totalScoreBySupervision;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
-
+    @JoinColumn(name = "question_id")
+    private EvaluationQuestions question;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "summary_assessment_id")
+    private SummaryAssessment summaryAssessment;
 
 }

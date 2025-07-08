@@ -8,7 +8,6 @@ import com.example.assessment_employee.exception.AppException;
 import com.example.assessment_employee.exception.ErrorCode;
 import com.example.assessment_employee.mapper.CriteriaFormMapper;
 import com.example.assessment_employee.mapper.EvaluationCriteriaMapper;
-import com.example.assessment_employee.mapper.EvaluationQuestionMapper;
 import com.example.assessment_employee.repository.CriteriaFormRepository;
 import com.example.assessment_employee.repository.EvaluationCriteriaRepository;
 import com.example.assessment_employee.repository.EvaluationAnswersRepository;
@@ -20,7 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,6 @@ public class CriteriaFormService {
     private final EvaluationAnswersRepository evaluationAnswersRepository;
     private final CriteriaFormMapper criteriaFormMapper;
     private final EvaluationCriteriaMapper evaluationCriteriaMapper;
-    private final EvaluationQuestionMapper evaluationQuestionMapper;
 
     /**
      * Helper method to manually map CriteriaForm to CriteriaFormResponse
@@ -49,24 +51,12 @@ public class CriteriaFormService {
                         criteriaInfo.setEvaluationCriteriaId(criteria.getEvaluationCriteriaId());
                         criteriaInfo.setCriteriaName(criteria.getCriteriaName());
 
-                        if (criteria.getEvaluationQuestions() != null && !criteria.getEvaluationQuestions().isEmpty()) {
-                            List<CriteriaFormResponse.QuestionInfo> questionInfoList = criteria.getEvaluationQuestions().stream()
-                                    .map(question -> {
-                                        CriteriaFormResponse.QuestionInfo questionInfo =
-                                                new CriteriaFormResponse.QuestionInfo();
-                                        questionInfo.setEvaluationQuestionId(question.getEvaluationQuestionId());
-                                        questionInfo.setQuestionName(question.getQuestionName());
-                                        questionInfo.setMaxScore(question.getMaxScore());
-                                        return questionInfo;
-                                    })
-                                    .collect(java.util.stream.Collectors.toList());
-                            criteriaInfo.setQuestions(questionInfoList);
-                        }
-
                         return criteriaInfo;
                     })
-                    .collect(java.util.stream.Collectors.toList());
+                    .collect(Collectors.toList());
             response.setEvaluationCriteria(criteriaInfoList);
+        } else {
+            response.setEvaluationCriteria(Collections.emptyList());
         }
 
         return response;
@@ -106,10 +96,11 @@ public class CriteriaFormService {
             log.warn("Criteria form creation failed: No evaluation criteria provided");
             throw new AppException(ErrorCode.CRITERIA_FORM_EMPTY);
         }
-        
-        List<EvaluationCriteria> evaluationCriteria = evaluationCriteriaRepository
-                .findByCriteriaIds(request.getEvaluationCriteriaIds());
-        
+
+        Set<EvaluationCriteria> evaluationCriteria = new HashSet<>(
+                evaluationCriteriaRepository.findByCriteriaIds(request.getEvaluationCriteriaIds())
+        );
+
         if (evaluationCriteria.size() != request.getEvaluationCriteriaIds().size()) {
             log.warn("Criteria form creation failed: Some evaluation criteria not found");
             throw new AppException(ErrorCode.EVALUATION_CRITERIA_NOT_FOUND);
@@ -217,9 +208,10 @@ public class CriteriaFormService {
             log.warn("Criteria form update failed: No evaluation criteria provided");
             throw new AppException(ErrorCode.CRITERIA_FORM_EMPTY);
         }
-        
-        List<EvaluationCriteria> evaluationCriteria = evaluationCriteriaRepository
-                .findByCriteriaIds(request.getEvaluationCriteriaIds());
+
+        Set<EvaluationCriteria> evaluationCriteria = new HashSet<>(
+                evaluationCriteriaRepository.findByCriteriaIds(request.getEvaluationCriteriaIds())
+        );
         
         if (evaluationCriteria.size() != request.getEvaluationCriteriaIds().size()) {
             log.warn("Criteria form update failed: Some evaluation criteria not found");
@@ -229,7 +221,7 @@ public class CriteriaFormService {
         // Update form fields
         criteriaFormMapper.updateEntity(request, existingForm);
         existingForm.setEvaluationCriteria(evaluationCriteria);
-        
+
         CriteriaForm updatedForm = criteriaFormRepository.save(existingForm);
         
         log.info("Criteria form updated successfully with ID: {}", updatedForm.getCriteriaFormId());
@@ -248,13 +240,6 @@ public class CriteriaFormService {
                     log.warn("Criteria form not found for deletion with ID: {}", id);
                     return new AppException(ErrorCode.CRITERIA_FORM_NOT_FOUND);
                 });
-        
-        // Check if this specific form is being used in evaluations
-        long formUsageCount = evaluationAnswersRepository.countByCriteriaFormId(id);
-        if (formUsageCount > 0) {
-            log.warn("Cannot delete criteria form with existing evaluations: {}", id);
-            throw new AppException(ErrorCode.CRITERIA_FORM_HAS_EVALUATIONS);
-        }
         
         criteriaFormRepository.deleteById(id);
         
@@ -293,20 +278,20 @@ public class CriteriaFormService {
         List<CriteriaForm> forms = criteriaFormRepository.findByCriteriaId(criteriaId);
         return mapToResponseList(forms);
     }
-    
+
     /**
-     * Get criteria form with full details (criteria and questions)
+     * Get criteria form with full details
      */
     @Transactional(readOnly = true)
     public CriteriaFormResponse getCriteriaFormWithFullDetails(Long id) {
         log.info("Getting criteria form with full details for ID: {}", id);
-        
+
         CriteriaForm form = criteriaFormRepository.findByIdWithEvaluationCriteria(id)
                 .orElseThrow(() -> {
                     log.warn("Criteria form not found with ID: {}", id);
                     return new AppException(ErrorCode.CRITERIA_FORM_NOT_FOUND);
                 });
-        
+
         return mapToResponse(form);
     }
     

@@ -1,6 +1,7 @@
 package com.example.assessment_employee.repository;
 
 import com.example.assessment_employee.dto.response.CriteriaAverageResponse;
+import com.example.assessment_employee.entity.CriteriaForm;
 import com.example.assessment_employee.entity.EvaluationAnswers;
 import com.example.assessment_employee.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -38,6 +38,12 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/evaluation-criteria/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/criteria-forms/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/criteria-forms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/evaluation-cycles/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/evaluation-questions/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
                         .anyRequest()
                         .authenticated());

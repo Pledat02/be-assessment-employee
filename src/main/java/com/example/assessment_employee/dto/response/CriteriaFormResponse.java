@@ -25,16 +25,5 @@ public class CriteriaFormResponse {
     public static class EvaluationCriteriaInfo {
         private Long evaluationCriteriaId;
         private String criteriaName;
-        private List<QuestionInfo> questions;
-    }
-    
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class QuestionInfo {
-        private Long evaluationQuestionId;
-        private String questionName;
-        private Long maxScore;
     }
 }

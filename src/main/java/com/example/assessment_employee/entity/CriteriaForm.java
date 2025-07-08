@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -20,7 +22,7 @@ public class CriteriaForm {
     private String criteriaFormName;
 
     @ManyToMany
-    private List<EvaluationCriteria> evaluationCriteria;
+    private Set<EvaluationCriteria> evaluationCriteria;
 
 
 }
