@@ -59,14 +59,13 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
      */
     @Query(value = """
     SELECT ec.criteria_name AS criteria,
-           SUM(COALESCE(ea.total_score, 0)) AS averageScore
+           sum(COALESCE(ea.total_score, 0))/count(cf.criteria_form) AS averageScore
     FROM evaluation_answers ea
     JOIN summary_assessment sa ON ea.summary_assessment_id = sa.summary_assessment_id
     JOIN criteria_form cf ON sa.criteria_form_id = cf.criteria_form_id
     JOIN evaluation_cycles ec2 ON cf.evaluation_cycle_id = ec2.evaluation_cycle_id
     JOIN evaluation_questions eq ON ea.question_id = eq.evaluation_question_id
     JOIN evaluation_criteria ec ON eq.evaluation_criteria_id = ec.evaluation_criteria_id
-    JOIN employee e ON sa.employee_id = e.id
     WHERE ec2.start_date >= :startDate
       AND ec2.end_date <= :endDate
     GROUP BY ec.criteria_name
@@ -86,7 +85,7 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
             "JOIN ea.question eq " +
             "WHERE e.code = :employeeId " +
             "GROUP BY eq.evaluationCriteria.criteriaName")
-    List<CriteriaAverageResponse> fetchAverageScoresByCriteriaForEmployee(@Param("employeeId") Long employeeId);
+    List<CriteriaEmployeeResponse> fetchAverageScoresByCriteriaForEmployee(@Param("employeeId") Long employeeId);
 
     /**
      * Find evaluation answers by summary assessment ID

@@ -51,10 +51,10 @@ public class EvaluationAnswers {
 
         // Trường hợp có hai điểm số > 0
         if (totalScoreByEmployee > 0 && totalScoreBySupervision > 0 && totalScoreByManager <= 0) {
-            return (totalScoreByEmployee + totalScoreBySupervision) / 2;
+            return  totalScoreBySupervision;
         }
         if (totalScoreByEmployee > 0 && totalScoreByManager > 0 && totalScoreBySupervision <= 0) {
-            return (totalScoreByEmployee + totalScoreByManager) / 2;
+            return totalScoreByManager;
         }
         if (totalScoreBySupervision > 0 && totalScoreByManager > 0 && totalScoreByEmployee <= 0) {
             return (totalScoreBySupervision + totalScoreByManager) / 2;

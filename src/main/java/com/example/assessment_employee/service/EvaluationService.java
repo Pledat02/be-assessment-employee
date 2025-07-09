@@ -84,12 +84,10 @@ public class EvaluationService {
                     // Set score based on assessor's role
                     if (isEmployeeAssessor(assessor, employee)) {
                         answer.setTotalScoreByEmployee(item.getEmployeeScore());
-                    } else if (isManagerAssessor(assessor, employee)) {
+                    }  if (isManagerAssessor(assessor, employee)) {
                         answer.setTotalScoreByManager(item.getManagerScore());
-                    } else if (isSupervisorAssessor(assessor, employee)) {
+                    }  if (isSupervisorAssessor(assessor, employee)) {
                         answer.setTotalScoreBySupervision(item.getSupervisorScore());
-                    } else {
-                        throw new AppException(ErrorCode.VALIDATION_ERROR);
                     }
                     answer.setTotalScore(answer.getAVGScore());
                     return answer;
@@ -166,9 +164,11 @@ public class EvaluationService {
      */
     private boolean isManagerAssessor(Employee assessor, Employee employee) {
         Department department = employee.getDepartment();
-        return department != null && department.getManagerCode() != null
+        boolean result = department != null
                 && Objects.equals(department.getDepartmentId(), assessor.getDepartment().getDepartmentId())
                 && assessor.getAccount().getRole().equals(RoleConstants.MANAGER);
+        log.info("result: "+result);
+        return result;
     }
 
     /**
