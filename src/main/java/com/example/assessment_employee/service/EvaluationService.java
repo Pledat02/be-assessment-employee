@@ -2,13 +2,17 @@ package com.example.assessment_employee.service;
 
 import com.example.assessment_employee.constants.RoleConstants;
 import com.example.assessment_employee.dto.request.AssessmentRequest;
+import com.example.assessment_employee.dto.request.SentimentRequest;
+import com.example.assessment_employee.dto.response.SentimentResponse;
 import com.example.assessment_employee.dto.response.SummaryAssessmentResponse;
 import com.example.assessment_employee.entity.*;
 import com.example.assessment_employee.exception.AppException;
 import com.example.assessment_employee.exception.ErrorCode;
 import com.example.assessment_employee.mapper.SummaryAssessmentMapper;
 import com.example.assessment_employee.repository.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EvaluationService {
 
     private final EvaluationAnswersRepository evaluationAnswersRepository;
@@ -28,6 +33,7 @@ public class EvaluationService {
     private final EvaluationQuestionsRepository evaluationQuestionsRepository;
     private final SummaryAssessmentRepository summaryAssessmentRepository;
     private final SummaryAssessmentMapper summaryAssessmentMapper;
+    SentimentAnalysisClient sentimentAnalysisClient;
 
     /**
      * Submits an assessment for an employee by an assessor (employee, manager, or supervisor).
@@ -92,7 +98,17 @@ public class EvaluationService {
 
         // Add evaluation answers to summary assessment
         summaryAssessment.getEvaluationAnswers().addAll(evaluationAnswersList);
-
+        // set score;
+        summaryAssessment.setAverageScore(evaluationAnswersList.stream()
+                .mapToDouble(EvaluationAnswers::getAVGScore)
+                .sum());
+        // sentiment
+        SentimentResponse sentimentResponse =sentimentAnalysisClient.analyzeSentiment(
+                SentimentRequest.builder()
+                        .comment(request.getComment())
+                        .build());
+        summaryAssessment.setSentiment(sentimentResponse.getSentiment()
+        );
         // Set comment if provided
         if (request.getComment() != null && !request.getComment().trim().isEmpty()) {
             summaryAssessment.setComment(request.getComment());

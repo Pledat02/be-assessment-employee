@@ -20,7 +20,7 @@ public class SummaryAssessment {
     private Long summaryAssessmentId;
     private long criteriaFormId;
     private Double averageScore;
-
+    private String sentiment;
     @Column(columnDefinition = "TEXT")
     private String comment; // Bình luận
 
