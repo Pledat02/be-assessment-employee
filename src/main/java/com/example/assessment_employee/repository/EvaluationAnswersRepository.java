@@ -86,5 +86,18 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
             "JOIN ea.question eq " +
             "WHERE e.code = :employeeId " +
             "GROUP BY eq.evaluationCriteria.criteriaName")
-    List<CriteriaEmployeeResponse> fetchAverageScoresByCriteriaForEmployee(@Param("employeeId") Long employeeId);
+    List<CriteriaAverageResponse> fetchAverageScoresByCriteriaForEmployee(@Param("employeeId") Long employeeId);
+
+    /**
+     * Find evaluation answers by summary assessment ID
+     */
+    @Query("SELECT ea FROM EvaluationAnswers ea WHERE ea.summaryAssessment.summaryAssessmentId = :summaryAssessmentId")
+    List<EvaluationAnswers> findBySummaryAssessmentId(@Param("summaryAssessmentId") Long summaryAssessmentId);
+
+    /**
+     * Count evaluation answers by summary assessment ID
+     */
+    @Query("SELECT COUNT(ea) FROM EvaluationAnswers ea WHERE ea.summaryAssessment.summaryAssessmentId = :summaryAssessmentId")
+    int countBySummaryAssessmentId(@Param("summaryAssessmentId") Long summaryAssessmentId);
+  
 }
