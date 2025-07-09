@@ -24,6 +24,7 @@ public class SummaryAssessmentResponse {
     private String comment;
     private long employeeId;
     private long formId;
+    private String sentiment;
 
     @Data
     @NoArgsConstructor

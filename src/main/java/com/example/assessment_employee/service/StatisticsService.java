@@ -1,17 +1,19 @@
 package com.example.assessment_employee.service;
 
-import com.example.assessment_employee.dto.response.CriteriaAverageResponse;
-import com.example.assessment_employee.dto.response.EmployeeSimpleResponse;
-import com.example.assessment_employee.dto.response.EvaluationStatisticsResponse;
-import com.example.assessment_employee.dto.response.TopEmployeeResponse;
+import com.example.assessment_employee.dto.response.*;
+import com.example.assessment_employee.entity.EvaluationCycles;
+import com.example.assessment_employee.exception.AppException;
+import com.example.assessment_employee.exception.ErrorCode;
 import com.example.assessment_employee.repository.EmployeeRepository;
 import com.example.assessment_employee.repository.EvaluationAnswersRepository;
+import com.example.assessment_employee.repository.EvaluationCyclesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class StatisticsService {
     private final EmployeeRepository employeeRepository;
     private final EvaluationAnswersRepository evaluationAnswersRepository;
+    private final EvaluationCyclesRepository evaluationCyclesRepository;
     public EvaluationStatisticsResponse getStatisticsOverview() {
         long total = employeeRepository.count();
         long evaluated = evaluationAnswersRepository.countEvaluatedEmployees();
@@ -44,7 +47,8 @@ public class StatisticsService {
             String fullName = (String) row[0];
             String position = (String) row[1];
             String department = (String) row[2];
-            double avgScore = ((Number) row[3]).doubleValue();
+            String sentiment = (String) row[3];
+            double avgScore = ((Number) row[4]).doubleValue();
 
             response.add(TopEmployeeResponse.builder()
                     .rank(rank++)
@@ -52,7 +56,7 @@ public class StatisticsService {
                     .position(position)
                     .department(department)
                     .averageScore(Math.round(avgScore * 10.0) / 10.0)
-                    .classification(classify(avgScore))
+                    .classification(sentiment)
                     .scoreDiffFromLast(0.0) // mặc định
                     .avatarUrl("https://via.placeholder.com/100")
                     .build());
@@ -61,18 +65,14 @@ public class StatisticsService {
         return response;
     }
 
-    private String classify(double score) {
-        if (score >= 4.5) return "Xuất sắc";
-        if (score >= 3.5) return "Tốt";
-        if (score >= 2.5) return "Trung bình";
-        return "Yếu";
-    }
 
-    public List<CriteriaAverageResponse> getCriteriaAverages(Integer quarter, Integer year, Long departmentId) {
-        LocalDate start = getQuarterStartDate(quarter, year);
-        LocalDate end = getQuarterEndDate(quarter, year);
-
-        List<Object[]> rawResults = evaluationAnswersRepository.getAverageScoreByCriteria(start.toString(), end.toString(), departmentId);
+    public List<CriteriaAverageResponse> getCriteriaAverages(Long cycleId) {
+        Optional<EvaluationCycles> evaluationCycles = evaluationCyclesRepository.findById(cycleId);
+        if(evaluationCycles.isEmpty()){
+            throw new AppException(ErrorCode.EVALUATION_CYCLE_NOT_FOUND);
+        }
+        EvaluationCycles evaluationCycle = evaluationCycles.get();
+        List<Object[]> rawResults = evaluationAnswersRepository.getAverageScoreByCriteria(evaluationCycle.getStartDate(), evaluationCycle.getEndDate());
 
         return rawResults.stream()
                 .map(obj -> new CriteriaAverageResponse(
@@ -83,35 +83,13 @@ public class StatisticsService {
     }
 
 
-    private LocalDate getQuarterStartDate(Integer quarter, Integer year) {
-        if (quarter == null || year == null) return LocalDate.of(year, 1, 1);
-        return switch (quarter) {
-            case 1 -> LocalDate.of(year, 1, 1);
-            case 2 -> LocalDate.of(year, 4, 1);
-            case 3 -> LocalDate.of(year, 7, 1);
-            case 4 -> LocalDate.of(year, 10, 1);
-            default -> throw new IllegalArgumentException("Invalid quarter: " + quarter);
-        };
-    }
-
-    private LocalDate getQuarterEndDate(Integer quarter, Integer year) {
-        if (quarter == null || year == null) return LocalDate.of(year, 12, 31);
-        return switch (quarter) {
-            case 1 -> LocalDate.of(year, 3, 31);
-            case 2 -> LocalDate.of(year, 6, 30);
-            case 3 -> LocalDate.of(year, 9, 30);
-            case 4 -> LocalDate.of(year, 12, 31);
-            default -> throw new IllegalArgumentException("Invalid quarter: " + quarter);
-        };
-    }
-
     public List<EmployeeSimpleResponse> getEmployeesEvaluated() {
         return employeeRepository.findDistinctEvaluatedEmployees().stream()
                 .map(e -> new EmployeeSimpleResponse(e.getAccount().getId(), e.getFullName()))
                 .collect(Collectors.toList());
     }
 
-    public List<CriteriaAverageResponse> getCriteriaScoresForEmployee(Long employeeId) {
+    public List<CriteriaEmployeeResponse> getCriteriaScoresForEmployee(Long employeeId) {
         return evaluationAnswersRepository.fetchAverageScoresByCriteriaForEmployee(employeeId);
     }
 

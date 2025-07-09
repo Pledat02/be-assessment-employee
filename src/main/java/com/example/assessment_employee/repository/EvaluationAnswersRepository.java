@@ -1,6 +1,7 @@
 package com.example.assessment_employee.repository;
 
 import com.example.assessment_employee.dto.response.CriteriaAverageResponse;
+import com.example.assessment_employee.dto.response.CriteriaEmployeeResponse;
 import com.example.assessment_employee.entity.EvaluationAnswers;
 import com.example.assessment_employee.entity.Employee;
 import com.example.assessment_employee.entity.SummaryAssessment;
@@ -32,18 +33,19 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
     /**
      * Count employees with total score >= 90 (rated 'Excellent')
      */
-    @Query("SELECT COUNT(DISTINCT ea.summaryAssessment.employee.code) FROM EvaluationAnswers ea WHERE ea.totalScore >= 90")
+    @Query("SELECT COUNT(DISTINCT ea.summaryAssessment.employee.code) FROM EvaluationAnswers ea WHERE ea.summaryAssessment.sentiment= 'Tốt' ")
     long countExcellentEmployees();
 
     /**
      * Find top 5 employees by average score
      */
-    @Query("SELECT e.fullName, e.staffType, d.departmentName, AVG(ea.totalScore) AS avgScore " +
+    @Query("SELECT e.fullName, e.staffType, d.departmentName, ea.summaryAssessment.sentiment," +
+            " ea.summaryAssessment.averageScore AS avgScore " +
             "FROM EvaluationAnswers ea " +
             "JOIN ea.summaryAssessment.employee e " +
             "JOIN e.department d " +
             "GROUP BY e.code, e.fullName, e.staffType, d.departmentName " +
-            "ORDER BY avgScore DESC")
+            "ORDER BY ea.summaryAssessment.averageScore DESC")
     List<Object[]> findTop5Employees();
 
     @Query("SELECT ea FROM EvaluationAnswers ea WHERE ea.summaryAssessment.summaryAssessmentId = :summaryAssessmentId AND ea.question.evaluationQuestionId = :questionId")
@@ -57,7 +59,7 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
      */
     @Query(value = """
     SELECT ec.criteria_name AS criteria,
-           AVG(COALESCE(ea.total_score, 0)) AS averageScore
+           SUM(COALESCE(ea.total_score, 0)) AS averageScore
     FROM evaluation_answers ea
     JOIN summary_assessment sa ON ea.summary_assessment_id = sa.summary_assessment_id
     JOIN criteria_form cf ON sa.criteria_form_id = cf.criteria_form_id
@@ -67,19 +69,18 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
     JOIN employee e ON sa.employee_id = e.id
     WHERE ec2.start_date >= :startDate
       AND ec2.end_date <= :endDate
-      AND (:departmentId IS NULL OR e.department_id = :departmentId)
     GROUP BY ec.criteria_name
     ORDER BY ec.criteria_name
     """, nativeQuery = true)
     List<Object[]> getAverageScoreByCriteria(
             @Param("startDate") String startDate,
-            @Param("endDate") String endDate,
-            @Param("departmentId") Long departmentId
+            @Param("endDate") String endDate
     );
 
-    @Query("SELECT new com.example.assessment_employee.dto.response.CriteriaAverageResponse(" +
+    @Query("SELECT new com.example.assessment_employee.dto.response.CriteriaEmployeeResponse(" +
             "eq.evaluationCriteria.criteriaName, " +
-            "AVG(COALESCE(ea.totalScore, 0))) " +
+            "SUM(COALESCE(ea.totalScore, 0)), " +
+            "SUM(COALESCE(eq.maxScore, 0))) " +
             "FROM EvaluationAnswers ea " +
             "JOIN ea.summaryAssessment.employee e " +
             "JOIN ea.question eq " +
@@ -98,4 +99,5 @@ public interface EvaluationAnswersRepository extends JpaRepository<EvaluationAns
      */
     @Query("SELECT COUNT(ea) FROM EvaluationAnswers ea WHERE ea.summaryAssessment.summaryAssessmentId = :summaryAssessmentId")
     int countBySummaryAssessmentId(@Param("summaryAssessmentId") Long summaryAssessmentId);
+  
 }
