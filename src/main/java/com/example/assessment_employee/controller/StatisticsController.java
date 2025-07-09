@@ -1,9 +1,6 @@
 package com.example.assessment_employee.controller;
 
-import com.example.assessment_employee.dto.response.CriteriaAverageResponse;
-import com.example.assessment_employee.dto.response.EmployeeSimpleResponse;
-import com.example.assessment_employee.dto.response.EvaluationStatisticsResponse;
-import com.example.assessment_employee.dto.response.TopEmployeeResponse;
+import com.example.assessment_employee.dto.response.*;
 import com.example.assessment_employee.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +29,12 @@ public class StatisticsController {
         return ResponseEntity.ok(topEmployees);
     }
 
-    @GetMapping("/criteria-average")
+    @GetMapping("/criteria-average/{cycleId}")
     public List<CriteriaAverageResponse> getCriteriaAverageByFilter(
-            @RequestParam(required = false) Integer quarter,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Long departmentId
+      @PathVariable long cycleId
     ) {
-        if (year == null) {
-            year = LocalDate.now().getYear(); // hoặc throw lỗi hợp lệ
-        }
-        return statisticsService.getCriteriaAverages(quarter, year, departmentId);
+
+        return statisticsService.getCriteriaAverages(cycleId);
     }
 
 
@@ -51,7 +44,7 @@ public class StatisticsController {
     }
 
     @GetMapping("/employee/{employeeId}/criteria-scores")
-    public ResponseEntity<List<CriteriaAverageResponse>> getCriteriaScoresForEmployee(@PathVariable Long employeeId) {
+    public ResponseEntity<List<CriteriaEmployeeResponse>> getCriteriaScoresForEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(statisticsService.getCriteriaScoresForEmployee(employeeId));
     }
 
