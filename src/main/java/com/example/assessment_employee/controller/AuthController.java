@@ -50,17 +50,31 @@ public class AuthController {
     }
     
     /**
+     * Test endpoint để kiểm tra backend hoạt động
+     */
+    @GetMapping("/test")
+    public ResponseEntity<ApiResponse<String>> testBackend() {
+        log.info("Test backend endpoint called");
+
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .code(200)
+                .message("Backend is working!")
+                .result("Test successful - " + java.time.LocalDateTime.now())
+                .build());
+    }
+
+    /**
      * Get current user information
      */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<LoginResponse.UserInfo>> getCurrentUser(
             @RequestHeader("Authorization") String token) {
         log.info("Get current user request");
-        
+
         // Extract username from token
         String username = authService.validateTokenAndGetUsername(token);
         LoginResponse.UserInfo userInfo = authService.getCurrentUser(username);
-        
+
         return ResponseEntity.ok(ApiResponse.<LoginResponse.UserInfo>builder()
                 .code(200)
                 .message("User information retrieved successfully")

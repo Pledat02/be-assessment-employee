@@ -106,4 +106,12 @@ public interface EvaluationQuestionsRepository extends JpaRepository<EvaluationQ
      */
     @Query("SELECT eq FROM EvaluationQuestions eq ORDER BY eq.evaluationCriteria.criteriaName, eq.questionName")
     List<EvaluationQuestions> findAllOrderedByCriteriaAndName();
+
+    /**
+     * Count questions by criteria form ID
+     * @param criteriaFormId the criteria form ID
+     * @return int
+     */
+    @Query("SELECT COUNT(eq) FROM EvaluationQuestions eq JOIN CriteriaForm cf ON eq.evaluationCriteria MEMBER OF cf.evaluationCriteria WHERE cf.criteriaFormId = :criteriaFormId")
+    int countByCriteriaFormId(@Param("criteriaFormId") Long criteriaFormId);
 }

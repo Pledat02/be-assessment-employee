@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/evaluation-cycles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/evaluation-questions/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/evaluation-history/**").permitAll() // Add evaluation history
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
                         .anyRequest()
                         .authenticated());

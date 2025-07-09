@@ -36,7 +36,5 @@ public class SummaryAssessmentResponse {
         private int employeeScore;
         private int supervisorScore;
         private int managerScore;
-
-
     }
 }
